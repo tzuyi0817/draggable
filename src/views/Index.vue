@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import DragDemo from '@/components/DragDemo.vue';
 
 </script>
 
 <template>
-  <div>123</div>
+  <drag-demo />
 </template>
+
+<style lang="scss" scoped>
+
+</style>
