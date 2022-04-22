@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import DragDemo from '@/components/DragDemo.vue';
 import DragList from '@/components/DragList.vue';
-import { reactive, toRefs, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { DemoListItem } from '@/types';
 
-const data = reactive({
-  list: [] as DemoListItem[],
-});
-const { list } = toRefs(data);
+const list = ref<DemoListItem[]>([]);
 
 function createUuid() {
   return URL.createObjectURL(new Blob()).slice(-36);
@@ -18,7 +15,7 @@ function randomList(quantity: number) {
 }
 
 onMounted(() => {
-  data.list = randomList(9);
+  list.value = randomList(9);
 });
 
 </script>
