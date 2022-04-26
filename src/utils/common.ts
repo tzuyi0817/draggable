@@ -22,3 +22,7 @@ export function deepClone(obj: any, hash = new WeakMap()) {
 
   return clone;
 }
+
+export function swap({ a, b, array }: { a: number, b: number, array: Array<unknown> }) {
+  [array[a], array[b]] = [array[b], array[a]];
+}
