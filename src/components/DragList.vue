@@ -7,10 +7,14 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const animationClass = {
+  moveToBefore: 'draggable-drop-up',
+  moveToAfter: 'draggable-drop-down',
+};
 </script>
 
 <template>
-  <draggable :tag="'ul'" v-model="list" class="draggable">
+  <draggable :tag="'ul'" v-model="list" class="draggable" :animation="animationClass">
     <li v-for="item in list" :key="item.id">
       <p>id: {{ item.name }}</p>
       <p>初始位置: {{ item.id }}</p>
@@ -31,6 +35,32 @@ const props = defineProps<Props>();
     align-items: center;
     padding: 0 20px;
     box-shadow: 2px 2px 10px rgba(black, 0.2);
+  }
+
+  .draggable-drop-up {
+    animation: dropUp 0.2s ease-in-out forwards;
+  }
+
+  .draggable-drop-down {
+    animation: dropDown 0.2s ease-in-out forwards;
+  }
+
+  @keyframes dropUp {
+    0% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes dropDown {
+    0% {
+      transform: translateY(20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
   }
 }
 </style>
