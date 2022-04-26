@@ -7,3 +7,8 @@ export interface DragAnimationClass {
   moveToBefore: string;
   moveToAfter: string;
 }
+
+export interface Selector {
+  ['.']: string;
+  ['#']: string;
+}

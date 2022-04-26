@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, nextTick, useSlots, defineComponent, h, useAttrs, watch } from 'vue';
+import { useSlots, defineComponent, h, useAttrs, watch, VNode } from 'vue';
 import { isVNodeArrayChildren, isVNode } from '@/utils/checkType';
-import { createUuid } from '@/utils/common';
-import { DragAnimationClass } from '@/types';
+import { DragAnimationClass, Selector } from '@/types';
+import useDrag from '@/hooks/useDrag';
 
 interface Props {
   tag?: string;
@@ -15,9 +15,15 @@ const attrs = useAttrs();
 const props = withDefaults(defineProps<Props>(), {
   tag: 'div',
 });
-const dragId = ref<string | undefined>(undefined);
-const currentDropElement = ref<HTMLLIElement | undefined>(undefined);
-const draggableList = ref<Array<string>>([]);
+const { 
+  handleDrag,
+  handleDragStart,
+  handleDragEnd,
+  handleDragOver,
+  setDraggableList,
+  draggableList,
+} = useDrag(props);
+
 const SlotItems = defineComponent({
   render() {
     if (!slots.default) return undefined;
@@ -25,20 +31,24 @@ const SlotItems = defineComponent({
       const rawProps  = attrs.class ? { class : [attrs.class] } : null;
       const children = isVNodeArrayChildren(vNode.children)
         ? vNode.children?.map((child, index) => {
-          return isVNode(child)
-            ? {
+          if (isVNode(child)) {
+            const draggable = isDraggable(child);
+
+            return {
               ...child,
               props: {
                 ...child.props,
-                draggable: true,
-                ondragstart: handleDragStart,
-                ondrag: handleDrag,
-                ondragend: handleDragEnd,
-                ondragover: handleDragOver,
+                draggable,
+                ondragstart: draggable && handleDragStart,
+                ondrag: draggable && handleDrag,
+                ondragend: draggable && handleDragEnd,
+                ondragover: draggable && handleDragOver,
+                class: setChildClass(child, draggable),
                 ['data-draggable-id']: draggableList.value[index],
               },
-            }
-            : child;
+            };
+          }
+          return child;
         })
         : vNode.children;
 
@@ -50,53 +60,22 @@ const SlotItems = defineComponent({
   }
 });
 
-function handleDrag(event: DragEvent) {
-  (<HTMLLIElement>event.target).style.opacity = '0';
+function isDraggable(child: VNode) {
+  const { draggable } = attrs;
+  if (draggable === void 0 || typeof draggable !== 'string') return true;
+  const config = { '.': 'class', '#': 'id' };
+  const selector = draggable.slice(0, 1) as keyof Selector;
+  const dragClass = draggable.slice(1);
+  const selectorName = child.props?.[config[selector]] ?? '';
+
+  return selectorName.split(' ').includes(dragClass);
 }
 
-function handleDragStart(event: DragEvent) {
-  if (!event.dataTransfer) return;
-  event.dataTransfer.effectAllowed = 'move';
-  dragId.value = (<HTMLLIElement>event.target).dataset.draggableId;
-}
+function setChildClass(child: VNode, draggable: boolean) {
+  const className = child.props?.class;
+  const addClass = draggable ? 'draggable__hover' : 'draggable__disable';
 
-function handleDragEnd(event: DragEvent) {
-  (<HTMLLIElement>event.target).style.opacity = '1';
-}
-
-function handleDragOver(event: DragEvent) {
-  event.preventDefault();
-  const target = <HTMLLIElement>event.target;
-  const dropId = target.dataset.draggableId;
-
-  if (target === currentDropElement.value || !dropId) return;
-  currentDropElement.value = target;
-  move(dragId.value, dropId);
-}
-
-async function move(dragId?: string, dropId?: string) {
-  if (!dragId || !dropId || dragId === dropId) return;
-  const dragIndex = draggableList.value.findIndex(id => id === dragId);
-  const dropIndex = draggableList.value.findIndex(id => id === dropId);
-
-  if (props.animation) {
-    const { moveToBefore, moveToAfter } = props.animation;
-    const addClass = dragIndex < dropIndex ? moveToAfter : moveToBefore;
-
-    currentDropElement.value?.classList.remove(moveToBefore, moveToAfter);
-    currentDropElement.value?.classList.add(addClass);
-  }
-  await nextTick();
-  swap({ a: dragIndex, b: dropIndex, array: draggableList.value });
-  swap({ a: dragIndex, b: dropIndex, array: props.modelValue });
-}
-
-function swap({ a, b, array }: { a: number, b: number, array: Array<unknown> }) {
-  [array[a], array[b]] = [array[b], array[a]];
-}
-
-function setDraggableList() {
-  draggableList.value = props.modelValue.map(_ => createUuid());
+  return (className ? `${className} ` : '') + addClass;
 }
 
 watch(() => props.modelValue, setDraggableList, { immediate: true });
@@ -105,3 +84,17 @@ watch(() => props.modelValue, setDraggableList, { immediate: true });
 <template>
   <slot-items />
 </template>
+
+<style lang="scss">
+.draggable__hover {
+  &:hover {
+    cursor: grab;
+  }
+}
+
+.draggable__disable {
+  &:hover {
+    cursor: no-drop
+  }
+}
+</style>
