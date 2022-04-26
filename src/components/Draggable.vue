@@ -2,10 +2,12 @@
 import { ref, nextTick, useSlots, defineComponent, h, useAttrs, watch } from 'vue';
 import { isVNodeArrayChildren, isVNode } from '@/utils/checkType';
 import { createUuid } from '@/utils/common';
+import { DragAnimationClass } from '@/types';
 
 interface Props {
   tag?: string;
   modelValue: unknown[];
+  animation?: DragAnimationClass;
 }
 
 const slots = useSlots();
@@ -76,10 +78,14 @@ async function move(dragId?: string, dropId?: string) {
   if (!dragId || !dropId || dragId === dropId) return;
   const dragIndex = draggableList.value.findIndex(id => id === dragId);
   const dropIndex = draggableList.value.findIndex(id => id === dropId);
-  const addClass = dragIndex < dropIndex ? 'draggable-drop-down' : 'draggable-drop-up';
 
-  currentDropElement.value?.classList.remove('draggable-drop-up', 'draggable-drop-down');
-  currentDropElement.value?.classList.add(addClass);
+  if (props.animation) {
+    const { moveToBefore, moveToAfter } = props.animation;
+    const addClass = dragIndex < dropIndex ? moveToAfter : moveToBefore;
+
+    currentDropElement.value?.classList.remove(moveToBefore, moveToAfter);
+    currentDropElement.value?.classList.add(addClass);
+  }
   await nextTick();
   swap({ a: dragIndex, b: dropIndex, array: draggableList.value });
   swap({ a: dragIndex, b: dropIndex, array: props.modelValue });
@@ -99,30 +105,3 @@ watch(() => props.modelValue, setDraggableList, { immediate: true });
 <template>
   <slot-items />
 </template>
-
-<style lang="scss">
-.draggable-drop-up {
-  animation: dropUp 0.2s ease-in-out forwards;
-}
-.draggable-drop-down {
-  animation: dropDown 0.2s ease-in-out forwards;
-}
-
-@keyframes dropUp {
-  0% {
-    transform: translateY(-20px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-@keyframes dropDown {
-  0% {
-    transform: translateY(20px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-</style>
