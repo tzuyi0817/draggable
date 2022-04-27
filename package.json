@@ -1,7 +1,26 @@
 {
-  "name": "traggable",
-  "private": true,
-  "version": "0.0.0",
+  "name": "vue3-draggable-tzu",
+  "version": "1.0.0",
+  "description": "A simple draggable with vue3",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/vue3-draggable.umd.js",
+  "module": "./dist/vue3-draggable.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue3-draggable.es.js",
+      "require": "./dist/vue3-draggable.umd.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tzuyi0817/draggable"
+  },
+  "keywords": [
+    "vue3",
+    "drag"
+  ],
   "scripts": {
     "serve": "vite",
     "build": "vue-tsc --noEmit && vite build",
