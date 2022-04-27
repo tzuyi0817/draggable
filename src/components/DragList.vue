@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DemoListItem } from '@/types';
-import Draggable from '@/components/Draggable.vue';
+import { Draggable } from '@/index';
 
 interface Props {
   list: DemoListItem[];
