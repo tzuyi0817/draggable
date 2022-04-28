@@ -1,16 +1,91 @@
-# Vue 3 + TypeScript + Vite
+# Vue 3 Draggable
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Vue 3 Draggable component
 
-## Recommended IDE Setup
+<p>
+  <a href="https://npm-stat.com/charts.html?package=vue3-draggable-tzu">
+    <img src="https://img.shields.io/npm/dm/vue3-draggable-tzu.svg" alt="npm"/>
+  </a>
+  <a href="https://www.npmjs.com/package/vue3-draggable-tzu">
+    <img src="https://img.shields.io/npm/v/vue3-draggable-tzu.svg" alt="npm"/>
+  </a>
+</p>
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
 
-## Type Support For `.vue` Imports in TS
+## Features
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+- Dragging
+- Controls whether dragging is possible
+- Dropping animation effect
+- Custom HTML tag
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+## Getting started
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+### Installation
+
+First step is to install it using `yarn`、`npm` or `pnpm`:
+
+```bash
+npm install vue3-draggable-tzu
+
+# or use yarn
+yarn add vue3-draggable-tzu
+
+# or use pnpm
+pnpm install vue3-draggable-tzu
+```
+
+### Basic Using
+
+```vue
+<script setup>
+import { ref, computed } from 'vue';
+import { Draggable } from 'vue3-draggable-tzu';
+
+const list = ref([
+  { id: 1, name: 'name1' },
+  { id: 2, name: 'name2' },
+  { id: 3, name: 'name3' },
+]);
+const animationClass = {
+  moveToBefore: 'draggable-drop-up',
+  moveToAfter: 'draggable-drop-down',
+};
+</script>
+
+<template>
+  <draggable
+    v-model="list"
+    :tag="'ul'"
+    class="draggable"
+    :animation="animationClass"
+    draggable=".item" // or without
+  >
+    <li v-for="item in list" :key="item.id" :class="item.id === 1 && 'item'">
+      <p>id: {{ item.id }}</p>
+      <p>name: {{ item.name }}</p>
+    </li>
+  </draggable>
+</template>
+
+<style>
+.draggable {
+  ...
+  .draggable-drop-up {
+    animation: dropUp 0.2s ease-in-out forwards;
+  }
+
+  .draggable-drop-down {
+    animation: dropDown 0.2s ease-in-out forwards;
+  }
+
+  @keyframes dropUp {
+    ...
+  }
+
+  @keyframes dropDown {
+    ...
+  }
+}
+</style>
+```
