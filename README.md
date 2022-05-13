@@ -35,6 +35,19 @@ yarn add vue3-draggable-tzu
 pnpm install vue3-draggable-tzu
 ```
 
+### Precautions
+
+If you use Vite Tooling and report an error (TypeError: Cannot read properties of null (reading 'setupContext')):
+
+```bash
+defineConfig({
+  ...
+  resolve: {
+    dedupe: ['vue'],
+  },
+});
+```
+
 ### Basic Using
 
 ```vue
