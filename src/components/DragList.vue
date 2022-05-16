@@ -3,7 +3,8 @@ import { DemoListItem } from '@/types';
 import { Draggable } from '@/index';
 
 interface Props {
-  list: DemoListItem[];
+  list1: DemoListItem[];
+  list2: DemoListItem[];
 }
 
 const props = defineProps<Props>();
@@ -14,19 +15,36 @@ const animationClass = {
 </script>
 
 <template>
-  <draggable :tag="'ul'" v-model="list" class="draggable" :animation="animationClass">
-    <li v-for="item in list" :key="item.id">
-      <p>id: {{ item.name }}</p>
-      <p>初始位置: {{ item.id }}</p>
-    </li>
-  </draggable>
+  <div>
+    <draggable :tag="'ul'" v-model="list1" class="draggable" :animation="animationClass">
+      <li v-for="item in list1" :key="item.id">
+        <p>id: {{ item.name }}</p>
+        <p>初始位置: {{ item.id }}</p>
+      </li>
+    </draggable>
+
+    <draggable :tag="'ul'" v-model="list2" class="draggable" :animation="animationClass">
+      <li v-for="item in list2" :key="item.id">
+        <p>id: {{ item.name }}</p>
+        <p>初始位置: {{ item.id }}</p>
+      </li>
+    </draggable>
+  </div>
 </template>
 
 <style lang="scss">
+div {
+  display: flex;
+}
+
 .draggable {
   width: 500px;
+  border: 1px solid rgba(black, 0.3);
+  box-shadow: 2px 2px 10px rgba(black, 0.2);
+  padding: 10px;
+  margin: 0 10px;
   li {
-    width: 100%;
+    width: calc(100% - 40px);
     display: flex;
     list-style-type: none;
     border: 1px solid rgba(black, 0.3);
