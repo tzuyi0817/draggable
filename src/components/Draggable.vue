@@ -2,6 +2,7 @@
 import { useSlots, defineComponent, h, useAttrs, watch, VNode } from 'vue';
 import { isVNodeArrayChildren, isVNode } from '@/utils/checkType';
 import { DragAnimationClass, Selector } from '@/types';
+import { createUuid } from '@/utils/common';
 import useDrag from '@/hooks/useDrag';
 
 interface Props {
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
   tag: 'div',
 });
 const { 
+  handleDrop,
   handleDrag,
   handleDragStart,
   handleDragEnd,
@@ -23,12 +25,16 @@ const {
   setDraggableList,
   draggableList,
 } = useDrag(props);
-
+const modelId = createUuid();
 const SlotItems = defineComponent({
   render() {
     if (!slots.default) return undefined;
     return slots.default().map(vNode => {
-      const rawProps  = attrs.class ? { class : [attrs.class] } : null;
+      const rawProps  = {
+        class: attrs.class && [attrs.class],
+        ondrop: handleDrop,
+        ['data-draggable-model']: modelId,
+      };
       const children = isVNodeArrayChildren(vNode.children)
         ? vNode.children?.map((child, index) => {
           if (isVNode(child)) {

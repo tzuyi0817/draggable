@@ -26,3 +26,14 @@ export function deepClone(obj: any, hash = new WeakMap()) {
 export function swap({ a, b, array }: { a: number, b: number, array: Array<unknown> }) {
   [array[a], array[b]] = [array[b], array[a]];
 }
+
+export function throttle(fun: Function, delay = 0) {
+  let timeStamp = 0;
+  return function (this: Function, ...args: unknown[]) {
+    const now = Date.now();
+    if (now - timeStamp < delay) return;
+
+    fun.apply(this, args);
+    timeStamp = now;
+  }
+}
