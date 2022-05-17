@@ -5,6 +5,7 @@ import { DragAnimationClass, ListMap } from '@/types';
 const listMap = new Map<string, ListMap>();
 const dragId = ref<string | undefined>(undefined);
 const dragAreaId = ref<string | undefined>(undefined);
+const currentDragElement = ref<HTMLLIElement | null>(null);
 const currentDropElement = ref<HTMLLIElement | null>(null);
 
 interface Props {
@@ -28,7 +29,10 @@ export default function useDrag(props: Props, areaId: string) {
   }
 
   function handleDrag(event: DragEvent) {
-    (<HTMLLIElement>event.target).style.opacity = '0';
+    const target = <HTMLLIElement>event.target;
+    if (target.dataset.draggableId === currentDragElement.value?.dataset.draggableId) return;
+    target.style.opacity = '0.5';
+    currentDragElement.value = target;
   }
   
   function handleDragStart(event: DragEvent) {
@@ -41,7 +45,7 @@ export default function useDrag(props: Props, areaId: string) {
   }
   
   function handleDragEnd() {
-    currentDropElement.value!.style.opacity = '1';
+    currentDragElement.value!.style.opacity = '1';
   }
   
   function handleDragEnter(event: DragEvent) {
@@ -54,7 +58,7 @@ export default function useDrag(props: Props, areaId: string) {
       moveOtherArea(areaId, dropId);
       return;
     }
-    if (target === currentDropElement.value || !dropId) return;
+    if (!dropId || target.dataset.draggableId === currentDropElement.value?.dataset.draggableId) return;
     currentDropElement.value = target;
     move(dropId);
   }
@@ -101,8 +105,8 @@ export default function useDrag(props: Props, areaId: string) {
   }
 
   function hideNewElement() {
-    currentDropElement.value = document.querySelector(`[data-draggable-id='${dragId.value}']`);
-    currentDropElement.value!.style.opacity = '0';
+    currentDragElement.value = document.querySelector(`[data-draggable-id='${dragId.value}']`);
+    currentDragElement.value!.style.opacity = '0.5';
   }
   
   function setDraggableList() {

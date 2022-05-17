@@ -18,6 +18,7 @@ Vue 3 Draggable component
 - Controls whether dragging is possible
 - Dropping animation effect
 - Custom HTML tag
+- Drag and drop of different blocks
 
 ## Getting started
 
@@ -55,7 +56,12 @@ defineConfig({
 import { ref, computed } from 'vue';
 import { Draggable } from 'vue3-draggable-tzu';
 
-const list = ref([
+const list1 = ref([
+  { id: 1, name: 'name1' },
+  { id: 2, name: 'name2' },
+  { id: 3, name: 'name3' },
+]);
+const list2 = ref([
   { id: 1, name: 'name1' },
   { id: 2, name: 'name2' },
   { id: 3, name: 'name3' },
@@ -68,13 +74,26 @@ const animationClass = {
 
 <template>
   <draggable
-    v-model="list"
+    v-model="list1"
     :tag="'ul'"
     class="draggable"
     :animation="animationClass"
     draggable=".item" // or without
   >
-    <li v-for="item in list" :key="item.id" :class="item.id === 1 && 'item'">
+    <li v-for="item in list1" :key="item.id" :class="item.id === 1 && 'item'">
+      <p>id: {{ item.id }}</p>
+      <p>name: {{ item.name }}</p>
+    </li>
+  </draggable>
+
+  <draggable
+    v-model="list2"
+    :tag="'ul'"
+    class="draggable"
+    :animation="animationClass"
+    draggable=".item"
+  >
+    <li v-for="item in list2" :key="item.id" :class="item.id === 1 && 'item'">
       <p>id: {{ item.id }}</p>
       <p>name: {{ item.name }}</p>
     </li>
@@ -102,3 +121,18 @@ const animationClass = {
 }
 </style>
 ```
+
+### Props
+
+Name | Required | Type | Description |
+--- | --- | --- | --- |
+modelValue | true | Array | v-model value |
+tag | false | String | custom HTML tag |
+animation | false | Object | keys for moveToBefore and |moveToAfter
+
+### Attrs
+
+Name | Required | Type | Description |
+--- | --- | --- | --- |
+class | false | String | v-model value |
+draggable | false | String | draggable for item class |
