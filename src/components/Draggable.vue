@@ -16,24 +16,24 @@ const attrs = useAttrs();
 const props = withDefaults(defineProps<Props>(), {
   tag: 'div',
 });
+const areaId = createUuid();
 const { 
-  handleDrop,
+  handleDragAreaEnter,
   handleDrag,
   handleDragStart,
   handleDragEnd,
-  handleDragOver,
+  handleDragEnter,
   setDraggableList,
   draggableList,
-} = useDrag(props);
-const modelId = createUuid();
+} = useDrag(props, areaId);
 const SlotItems = defineComponent({
   render() {
     if (!slots.default) return undefined;
     return slots.default().map(vNode => {
       const rawProps  = {
         class: attrs.class && [attrs.class],
-        ondrop: handleDrop,
-        ['data-draggable-model']: modelId,
+        ondragenter: handleDragAreaEnter,
+        ['data-draggable-area']: areaId,
       };
       const children = isVNodeArrayChildren(vNode.children)
         ? vNode.children?.map((child, index) => {
@@ -48,7 +48,7 @@ const SlotItems = defineComponent({
                 ondragstart: draggable && handleDragStart,
                 ondrag: draggable && handleDrag,
                 ondragend: draggable && handleDragEnd,
-                ondragover: draggable && handleDragOver,
+                ondragenter: draggable && handleDragEnter,
                 class: setChildClass(child, draggable),
                 ['data-draggable-id']: draggableList.value[index],
               },

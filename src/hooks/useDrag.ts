@@ -1,24 +1,30 @@
-import { ref, nextTick } from 'vue';
-import { createUuid, swap, throttle } from '@/utils/common';
-import { DragAnimationClass } from '@/types';
+import { ref, nextTick, toRefs } from 'vue';
+import { createUuid, swap } from '@/utils/common';
+import { DragAnimationClass, ListMap } from '@/types';
+
+const listMap = new Map<string, ListMap>();
+const dragId = ref<string | undefined>(undefined);
+const dragAreaId = ref<string | undefined>(undefined);
+const currentDropElement = ref<HTMLLIElement | null>(null);
 
 interface Props {
   modelValue: unknown[];
   animation?: DragAnimationClass;
 }
 
-const globalListMap = new Map();
-
-export default function useDrag(props: Props) {
-  const dragId = ref<string | undefined>(undefined);
-  const currentDropElement = ref<HTMLLIElement | undefined>(undefined);
+export default function useDrag(props: Props, areaId: string) {
   const draggableList = ref<Array<string>>([]);
-  const throttleDragOver = throttle(handleDragOver);
+  const { modelValue } = toRefs(props);
 
-  // globalListMap.set(draggableList, draggableList);
+  listMap.set(areaId, {
+    draggableList,
+    modelValue,
+  });
 
-  function handleDrop(event: DragEvent) {
-    console.log("handleDrop", event);
+  function handleDragAreaEnter(event: DragEvent) {
+    const areaId = (<HTMLLIElement>event.target).dataset.draggableArea;
+    if (areaId === void 0) return;
+    moveOtherArea(areaId);
   }
 
   function handleDrag(event: DragEvent) {
@@ -27,32 +33,35 @@ export default function useDrag(props: Props) {
   
   function handleDragStart(event: DragEvent) {
     if (!event.dataTransfer) return;
+    const target = <HTMLLIElement>event.target;
+
     event.dataTransfer.effectAllowed = 'move';
-    dragId.value = (<HTMLLIElement>event.target).dataset.draggableId;
+    dragId.value = target.dataset.draggableId;
+    dragAreaId.value = (<HTMLLIElement>target.parentNode).dataset.draggableArea;
   }
   
-  function handleDragEnd(event: DragEvent) {
-    (<HTMLLIElement>event.target).style.opacity = '1';
+  function handleDragEnd() {
+    currentDropElement.value!.style.opacity = '1';
   }
   
-  function handleDragOver(event: DragEvent) {
+  function handleDragEnter(event: DragEvent) {
     event.preventDefault();
     const target = <HTMLLIElement>event.target;
     const dropId = target.dataset.draggableId;
-    const model = (<HTMLLIElement>target.parentNode)?.dataset.draggableModel;
-    console.log(model)
-    // const model = target.dataset.draggableModel;
-    if (target === currentDropElement.value || model === void 0) return;
-    if (!dropId) {
+    const areaId = (<HTMLLIElement>target.parentNode).dataset.draggableArea;
+
+    if (areaId !== void 0 && areaId !== dragAreaId.value) {
+      moveOtherArea(areaId, dropId);
       return;
     }
+    if (target === currentDropElement.value || !dropId) return;
     currentDropElement.value = target;
-    move(dragId.value, dropId);
+    move(dropId);
   }
   
-  async function move(dragId?: string, dropId?: string) {
-    if (!dragId || dragId === dropId) return;
-    const dragIndex = draggableList.value.findIndex(id => id === dragId);
+  async function move(dropId?: string) {
+    if (!dragId.value || dragId.value === dropId) return;
+    const dragIndex = draggableList.value.findIndex(id => id === dragId.value);
     const dropIndex = draggableList.value.findIndex(id => id === dropId);
 
     if (props.animation) {
@@ -63,8 +72,37 @@ export default function useDrag(props: Props) {
       currentDropElement.value?.classList.add(addClass);
     }
     await nextTick();
-    swap({ a: dragIndex, b: dropIndex, array: draggableList.value });
-    swap({ a: dragIndex, b: dropIndex, array: props.modelValue });
+    swap({ a: dragIndex, b: dropIndex, from: draggableList.value });
+    swap({ a: dragIndex, b: dropIndex, from: props.modelValue });
+  }
+
+  async function moveOtherArea(areaId: string, dropId?: string) {
+    if (!dragAreaId.value) return;
+    const { draggableList: preList, modelValue: preModel } = listMap.get(dragAreaId.value)!;
+    dragAreaId.value = areaId;
+    const { draggableList: list, modelValue: model } = listMap.get(dragAreaId.value)!;
+    const dragIndex = preList.value.findIndex((id: string) => id === dragId.value);
+
+    if (!dropId) {
+      moveToEmptyArea(preList.value, list.value, dragIndex);
+      moveToEmptyArea(preModel.value, model.value, dragIndex);
+    } else {
+      const dropIndex = list.value.findIndex((id: string) => id === dropId); 
+      swap({ a: dragIndex, b: dropIndex, from: preList.value, to: list.value });
+      swap({ a: dragIndex, b: dropIndex, from: preModel.value, to: model.value });
+    }
+    await nextTick();
+    hideNewElement();
+  }
+
+  function moveToEmptyArea(previous: unknown[], current: unknown[], index: number) {
+    const [target] = previous.splice(index, 1);
+    current.push(target);
+  }
+
+  function hideNewElement() {
+    currentDropElement.value = document.querySelector(`[data-draggable-id='${dragId.value}']`);
+    currentDropElement.value!.style.opacity = '0';
   }
   
   function setDraggableList() {
@@ -72,11 +110,11 @@ export default function useDrag(props: Props) {
   }
 
   return {
-    handleDrop,
+    handleDragAreaEnter,
     handleDrag,
     handleDragStart,
     handleDragEnd,
-    handleDragOver: throttleDragOver,
+    handleDragEnter,
     setDraggableList,
     draggableList,
   }

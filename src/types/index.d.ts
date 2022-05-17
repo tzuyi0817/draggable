@@ -12,3 +12,8 @@ export interface Selector {
   ['.']: string;
   ['#']: string;
 }
+
+export interface ListMap {
+  draggableList: Ref<string[]>;
+  modelValue: Ref<unknown[]>;
+}
