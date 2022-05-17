@@ -23,8 +23,10 @@ export function deepClone(obj: any, hash = new WeakMap()) {
   return clone;
 }
 
-export function swap({ a, b, array }: { a: number, b: number, array: Array<unknown> }) {
-  [array[a], array[b]] = [array[b], array[a]];
+export function swap({ a, b, from, to }: { a: number, b: number, from: Array<unknown>, to?: Array<unknown> }) {
+  to
+    ? [from[a], to[b]] = [to[b], from[a]]
+    : [from[a], from[b]] = [from[b], from[a]];
 }
 
 export function throttle(fun: Function, delay = 0) {
