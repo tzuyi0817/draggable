@@ -125,14 +125,14 @@ const animationClass = {
 ### Props
 
 Name | Required | Type | Description |
---- | --- | --- | --- |
+:--- | :--- | :--- | :--- |
 modelValue | true | Array | v-model value |
-tag | false | String | custom HTML tag |
+tag | false | String | custom HTML tag - default `<div>` |
 animation | false | Object | keys for moveToBefore and |moveToAfter
 
 ### Attrs
 
 Name | Required | Type | Description |
---- | --- | --- | --- |
+:--- | :--- | :--- | :--- |
 class | false | String | v-model value |
 draggable | false | String | draggable for item class |
