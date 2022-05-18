@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import { resolve } from "path";
 
 export default defineConfig({
-  base: "./",
+  base: process.env.NODE_ENV === 'production' ? '/draggable/' : './',
   plugins: [
     vue(),
   ],
@@ -16,12 +16,12 @@ export default defineConfig({
     },
   },
   build: {
-    // outDir: './docs',
-    lib: {
-      entry: resolve(__dirname, "src/index.ts"),
-      name: 'vue3-draggable',
-      fileName: (format) => `vue3-draggable.${format}.js`
-    },
+    outDir: './docs',
+    // lib: {
+    //   entry: resolve(__dirname, "src/index.ts"),
+    //   name: 'vue3-draggable',
+    //   fileName: (format) => `vue3-draggable.${format}.js`
+    // },
     cssCodeSplit: true,
     rollupOptions: {
       external: ['vue'],

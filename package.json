@@ -25,6 +25,7 @@
   "scripts": {
     "serve": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "build:docs": "vite build --base=/draggable/",
     "preview": "vite preview"
   },
   "dependencies": {
