@@ -1,6 +1,6 @@
 {
   "name": "vue3-draggable-tzu",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A simple draggable with vue3",
   "license": "MIT",
   "files": [
@@ -25,7 +25,7 @@
   "scripts": {
     "serve": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "predeploy": "vite build",
+    "build:docs": "vite build",
     "deploy": "gh-pages -d docs",
     "preview": "vite preview"
   },

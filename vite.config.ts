@@ -16,12 +16,12 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: './docs',
-    // lib: {
-    //   entry: resolve(__dirname, "src/index.ts"),
-    //   name: 'vue3-draggable',
-    //   fileName: (format) => `vue3-draggable.${format}.js`
-    // },
+    // outDir: './docs',
+    lib: {
+      entry: resolve(__dirname, "src/index.ts"),
+      name: 'vue3-draggable',
+      fileName: (format) => `vue3-draggable.${format}.js`
+    },
     cssCodeSplit: true,
     rollupOptions: {
       external: ['vue'],
