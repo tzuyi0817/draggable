@@ -134,5 +134,5 @@ animation | false | Object | keys for moveToBefore and |moveToAfter
 
 Name | Required | Type | Description |
 :--- | :--- | :--- | :--- |
-class | false | String | v-model value |
+class | false | String | custom class |
 draggable | false | String | draggable for item class |

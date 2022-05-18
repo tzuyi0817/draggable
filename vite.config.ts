@@ -16,6 +16,7 @@ export default defineConfig({
     },
   },
   build: {
+    // outDir: './docs',
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: 'vue3-draggable',

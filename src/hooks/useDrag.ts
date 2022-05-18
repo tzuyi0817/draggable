@@ -31,7 +31,7 @@ export default function useDrag(props: Props, areaId: string) {
   function handleDrag(event: DragEvent) {
     const target = <HTMLLIElement>event.target;
     if (target.dataset.draggableId === currentDragElement.value?.dataset.draggableId) return;
-    target.style.opacity = '0.5';
+    target.style.opacity = '0.3';
     currentDragElement.value = target;
   }
   
@@ -106,7 +106,7 @@ export default function useDrag(props: Props, areaId: string) {
 
   function hideNewElement() {
     currentDragElement.value = document.querySelector(`[data-draggable-id='${dragId.value}']`);
-    currentDragElement.value!.style.opacity = '0.5';
+    currentDragElement.value!.style.opacity = '0.3';
   }
   
   function setDraggableList() {
